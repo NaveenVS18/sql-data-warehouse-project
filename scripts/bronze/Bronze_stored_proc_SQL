@@ -1,0 +1,82 @@
+execute bronze.load_bronze;
+
+Create or alter procedure bronze.load_bronze as 
+
+begin
+ declare @start_time DateTime, @end_time DateTime, @batch_start_time DateTime, @batch_end_time DateTime;
+ begin try
+ set @batch_start_time = getdate();
+Print '*****LOADING BRONZE LAYER*****';
+Print '============================================================'
+
+Print '------LOADING CRM TABLES------';
+   Print '                                  ';
+   set @start_time = getdate();
+   print 'Truncating table crm_cust_info ';
+		Truncate table bronze.crm_cust_info;
+	print 'Loading crm_cust_info table:';
+		bulk insert bronze.crm_cust_info from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+		with (firstrow = 2, fieldterminator = ',', tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+		set @start_time = getdate();
+	print 'Truncating table crm_prd_info';
+		Truncate table bronze.crm_prd_info;
+	print 'Loading crm_prd_info table:';
+		bulk insert bronze.crm_prd_info from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
+		with (firstrow = 2, fieldterminator = ',', tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+		set @start_time = getdate();
+		print 'Truncating table crm_sales_details';	
+		Truncate table bronze.crm_sales_details;
+    print 'Loading crm_sales_details table:';
+		bulk insert bronze.crm_sales_details from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
+		with (firstrow = 2, fieldterminator = ',',tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+		
+Print '------LOADING ERP TABLES------';
+   Print '                                  ';
+   set @start_time = getdate();
+   print 'Truncating table erp_cust_az12';
+		Truncate table bronze.erp_cust_az12;
+   print('Loading erp_cust_az12 table:')
+		bulk insert bronze.erp_cust_az12 from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\CUST_AZ12.csv'
+		with (firstrow =2 , fieldterminator = ',',tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+		set @start_time = getdate();
+	print 'Truncating table erp_loc_a101';
+		Truncate table bronze.erp_loc_a101;
+	print 'Loading erp_loc_a101 table:';
+		bulk insert bronze.erp_loc_a101 from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\LOC_A101.csv'
+		with (firstrow =2, fieldterminator = ',', tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+		set @start_time = getdate();
+	print 'Truncating table erp_px_cat_glv2';	
+		Truncate table bronze.erp_px_cat_glv2;
+    print 'Loading erp_px_cat_glv2 table:';
+		bulk insert bronze.erp_px_cat_glv2 from 'D:\Users\LENOVO\Desktop\SQL ADVANCED\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+		with (firstrow = 2, fieldterminator = ',', tablock);
+		set @end_time = getdate();
+		print 'LOAD DURATION:' +cast(DATEDIFF(second, @start_time, @end_time) as NVARCHAR) + 'seconds';
+		print('------------------------------------------------------------------------------')
+	
+		set @batch_end_time = getdate();
+		print 'BATCH LOAD DURATION :' + cast(datediff(second, @batch_start_time, @batch_end_time) as varchar) + 'seconds';
+	end try
+	begin catch
+	print 'ERROR OCCURED DURING LOADING BRONZE LAYER'
+	PRINT ('ERROR MESSAGE' + ERROR_MESSAGE());
+	PRINT ('ERROR NUMBER' + CAST(ERROR_NUMBER() AS NVARCHAR));
+	PRINT ('ERROR NUMBER' + CAST(ERROR_STATE() AS NVARCHAR));
+	end catch
+
+end
